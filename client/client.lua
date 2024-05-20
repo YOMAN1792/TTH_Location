@@ -19,7 +19,7 @@ local function createMenuOption(label, price, model)
                 end
             end
             -- Trigger a server event to handle the selection
-            TriggerServerEvent('{-YOMAN1792#2784-}::Location', args.price, args.label, args.model)
+            TriggerServerEvent('{-TTH_Location-}::Location', args.price, args.label, args.model)
             -- Hide the context menu
             lib.hideContext()
         end
@@ -81,8 +81,8 @@ Citizen.CreateThread(function()
 end)
 
 -- Register a network event that spawns a car when triggered
-RegisterNetEvent('{-YOMAN1792#2784-}::Location:spawnCar')
-AddEventHandler('{-YOMAN1792#2784-}::Location:spawnCar', function(car)
+RegisterNetEvent('{-TTH_Location-}::Location:spawnCar')
+AddEventHandler('{-TTH_Location-}::Location:spawnCar', function(car)
     local status, error = pcall(function()
     local model = GetHashKey(car)
 

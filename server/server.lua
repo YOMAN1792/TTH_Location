@@ -1,5 +1,5 @@
-RegisterNetEvent('{-YOMAN1792#2784-}::Location')
-AddEventHandler('{-YOMAN1792#2784-}::Location', function(price, label, model)
+RegisterNetEvent('{-TTH_Location-}::Location')
+AddEventHandler('{-TTH_Location-}::Location', function(price, label, model)
   local status, error = pcall(function()
   local _source = source
   local xPlayer = ESX.GetPlayerFromId(source)
@@ -44,7 +44,7 @@ AddEventHandler('{-YOMAN1792#2784-}::Location', function(price, label, model)
     TriggerClientEvent('esx:showAdvancedNotification', source, Language[Config.lang].NotifNoMoney["sender"], Language[Config.lang].NotifNoMoney["subject"], Language[Config.lang].NotifNoMoney["msg"], Config.textureDict, 1)
     return
   end
-  TriggerClientEvent('{-YOMAN1792#2784-}::Location:spawnCar', source, car)
+  TriggerClientEvent('{-TTH_Location-}::Location:spawnCar', source, car)
 end)
 
 AddEventHandler('onResourceStart', function(resourceName)
