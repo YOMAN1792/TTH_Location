@@ -5,7 +5,6 @@ local function createMenuOption(label, price, model)
         title = label,
         description = string.format(Language[Config.lang].Menu["locationDescriptionFormat"], label, price),
         args = args,
-        -- Define what happens when this menu option is selected
         onSelect = function(selected, secondary)
             -- If debug mode is on, print some important information to the console
             if Config.Debug == true then
@@ -59,7 +58,7 @@ Citizen.CreateThread(function()
         local plyCoords = GetEntityCoords(GetPlayerPed(-1), false)
         local nearMenu = false
         for k in pairs(Config.PositionArea) do
-            local dist = Vdist(plyCoords.x, plyCoords.y, plyCoords.z, Config.PositionArea[k].x, Config.PositionArea[k].y, Config.PositionArea[k].z)
+            local dist = #(plyCoords - Config.PositionArea[k])
             if dist <= 1.0 then
                 nearMenu = true
                 if not notificationShown then
@@ -69,7 +68,7 @@ Citizen.CreateThread(function()
                 if IsControlJustPressed(1, 51) then
                     lib.showContext('Location')
                 end
-                break -- Exit the loop as soon as we find a nearby menu
+                break -- Exit the loop as soon as we find a nearby menu to reduce latency
             end
         end
         -- Adjust the wait time based on whether the player is near a menu
@@ -84,42 +83,51 @@ end)
 RegisterNetEvent('{-TTH_Location-}::Location:spawnCar')
 AddEventHandler('{-TTH_Location-}::Location:spawnCar', function(car)
     local status, error = pcall(function()
-    local model = GetHashKey(car)
+        local model = GetHashKey(car)
+        local playerId = GetPlayerServerId(PlayerId())
+        local playerName = GetPlayerName(PlayerId())
 
-    -- Check if the model is loaded
-    if not HasModelLoaded(model) then
-        RequestModel(model)
-        while not HasModelLoaded(model) do
+        -- Check if the model is loaded
+        if not HasModelLoaded(model) then
+            RequestModel(model)
+            while not HasModelLoaded(model) do
+                Citizen.Wait(0)
+            end
+        end
+
+        local retval = PlayerPedId()
+
+        -- Show a notification when the car is spawned
+        ESX.ShowAdvancedNotification(
+            Language[Config.lang].NotifVehicleSpawn["sender"],
+            Language[Config.lang].NotifVehicleSpawn["subject"],
+            Language[Config.lang].NotifVehicleSpawn["msg"],
+            Config.textureDict, 1)
+        RequestModel(car)
+        while not HasModelLoaded(car) do
+            RequestModel(car)
             Citizen.Wait(0)
         end
+
+        local x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(-1), false))
+        Citizen.Wait(500)
+        local vehicle = CreateVehicle(car,
+            Config.VehiclePosition.x,
+            Config.VehiclePosition.y,
+            Config.VehiclePosition.z,
+            Config.VehiclePosition.heading, true, false)
+        SetEntityAsMissionEntity(vehicle, true, true)
+        local plaque = Config.PlateName
+        SetVehicleNumberPlateText(vehicle, plaque)
+        TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
+        TriggerServerEvent('{-TTH_Location-}::Location:DiscordLog', playerId, playerName, car)
+    end)
+    if not status then
+        print('^1An error occurred: ' .. error)
     end
-
-    local retval = PlayerPedId()
-
-    -- Show a notification when the car is spawned
-    ESX.ShowAdvancedNotification(Language[Config.lang].NotifVehicleSpawn["sender"], Language[Config.lang].NotifVehicleSpawn["subject"], Language[Config.lang].NotifVehicleSpawn["msg"], Config.textureDict, 1)
-    RequestModel(car)
-    while not HasModelLoaded(car) do
-        RequestModel(car)
-        Citizen.Wait(0)
-    end
-
-    local x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(-1), false))
-    Citizen.Wait(500)
-    local vehicle = CreateVehicle(car, Config.VehiclePosition.x, Config.VehiclePosition.y, Config.VehiclePosition.z,
-        Config.VehiclePosition.heading, true, false)
-    SetEntityAsMissionEntity(vehicle, true, true)
-    local plaque = Config.PlateName
-    SetVehicleNumberPlateText(vehicle, plaque)
-    TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
-end)
-if not status then
-    print('^1An error occurred: ' .. error)
-end
 end)
 
 -- PED
--- Create a thread to spawn a non-player character (NPC) at specified locations
 Citizen.CreateThread(function()
     local hash = GetHashKey("cs_lazlow")
     while not HasModelLoaded(hash) do
@@ -136,7 +144,6 @@ end)
 
 
 -- -- BLIPS
--- Create a thread to add blips (markers) on the game map at specified locations
 Citizen.CreateThread(function()
     for k, v in pairs(Config.BlipMap) do
         local blip = AddBlipForCoord(v.x, v.y, v.z)
@@ -151,4 +158,3 @@ Citizen.CreateThread(function()
         EndTextCommandSetBlipName(blip)
     end
 end)
-

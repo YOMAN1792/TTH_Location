@@ -14,7 +14,7 @@ Config = {
 
 	-- sets near the ped so when the player enter in the 1 M radius they can open the menu
 	PositionArea = {
-		{ x = -1034.8305, y = -2733.0974, z = 20.1692 }
+		vector3(-1034.8305, -2733.0974, 20.1692)
 	},
 
 	PosPed = {
