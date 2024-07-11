@@ -27,7 +27,7 @@ Contributions are welcome! If you wish to contribute, please fork the project, m
 
 ## License
 
-
+This project is under MIT License.
 
 ## Contact
 
