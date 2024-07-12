@@ -89,18 +89,3 @@ AddEventHandler('{-TTH_Location-}::Location', function(price, label, model)
     print('^1An error occurred: ' .. error)
   end
 end)
-
-
-
-
-
-
-
---[[
-AddEventHandler('playerConnecting', function(playerName, setKickReason)
-  identifiers = GetPlayerIdentifiers(source)
-  for i in ipairs(identifiers) do
-      print('Player: ' .. playerName .. ', Identifier #' .. i .. ': ' .. identifiers[i])
-  end
-end)
-]]
