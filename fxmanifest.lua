@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'YOMAN1792'
 description 'Location system done with OX_Lib for Esx'
-version '1.0'
+version '1.0.1'
 
 
 client_script "client/client.lua"
