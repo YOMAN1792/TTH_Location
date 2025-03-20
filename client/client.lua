@@ -5,7 +5,7 @@ local function createMenuOption(label, price, model)
         title = label,
         description = string.format(Language[Config.lang].Menu["locationDescriptionFormat"], label, price),
         args = args,
-        onSelect = function(selected, secondary)
+        onSelect = function(selected)
             -- If debug mode is on, print some important information to the console
             if Config.Debug == true then
                 print("onSelect called")
@@ -18,7 +18,11 @@ local function createMenuOption(label, price, model)
                 end
             end
             -- Trigger a server event to handle the selection
-            TriggerServerEvent('TTH_Location.Location', args.price, args.label, args.model)
+            if args.price and args.label and args.model then
+                TriggerServerEvent('TTH_Location.Location', args.price, args.label, args.model)
+            else
+                print("^1Error: Missing arguments for TriggerServerEvent. Ensure price, label, and model are valid.")
+            end
             -- Hide the context menu
             lib.hideContext()
         end
@@ -67,13 +71,17 @@ Citizen.CreateThread(function()
     function point:enter()
         canInteract = true
         ESX.TextUI(Language[Config.lang].Menu["Notification"])
-        print("Enter")
+        if Config.Debug == true then
+            print("Enter")
+        end
     end
 
     function point:leave()
         canInteract = false
         ESX.HideUI()
-        print("Leave")
+        if Config.Debug == true then
+            print("Leave")
+        end
     end
 end)
 
@@ -92,8 +100,6 @@ AddEventHandler('TTH_Location.Location:spawnCar', function(car)
                 Citizen.Wait(0)
             end
         end
-
-        local retval = PlayerPedId()
 
         -- Show a notification when the car is spawned
         ESX.ShowAdvancedNotification(
