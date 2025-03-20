@@ -55,7 +55,7 @@ Citizen.CreateThread(function()
     local notificationShown = false -- Track if the notification has been shown
     while true do
         Citizen.Wait(waitTime)
-        local plyCoords = GetEntityCoords(GetPlayerPed(-1), false)
+        local plyCoords = GetEntityCoords(PlayerPedId(), false)
         local nearMenu = false
         for k in pairs(Config.PositionArea) do
             local dist = #(plyCoords - Config.PositionArea[k])
@@ -109,7 +109,7 @@ AddEventHandler('{-TTH_Location-}::Location:spawnCar', function(car)
             Citizen.Wait(0)
         end
 
-        local x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(-1), false))
+        local x, y, z = table.unpack(GetEntityCoords(PlayerPedId(), false))
         Citizen.Wait(500)
         local vehicle = CreateVehicle(car,
             Config.VehiclePosition.x,
