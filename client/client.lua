@@ -51,31 +51,29 @@ updateMenuOptions()
 
 -- Create a thread to show the context menu when the player is near the location
 Citizen.CreateThread(function()
-    local waitTime = 500            -- Default wait time
-    local notificationShown = false -- Track if the notification has been shown
-    while true do
-        Citizen.Wait(waitTime)
-        local plyCoords = GetEntityCoords(PlayerPedId(), false)
-        local nearMenu = false
-        for k in pairs(Config.PositionArea) do
-            local dist = #(plyCoords - Config.PositionArea[k])
-            if dist <= 1.0 then
-                nearMenu = true
-                if not notificationShown then
-                    ESX.ShowNotification(Language[Config.lang].Menu["Notification"])
-                    notificationShown = true
-                end
-                if IsControlJustPressed(1, 51) then
-                    lib.showContext('Location')
-                end
-                break -- Exit the loop as soon as we find a nearby menu to reduce latency
-            end
-        end
-        -- Adjust the wait time based on whether the player is near a menu
-        waitTime = nearMenu and 0 or 500
-        if not nearMenu then
-            notificationShown = false -- Reset the notification tracking when the player is not near a menu
-        end
+    local canInteract = false
+    local point = ESX.Point:new({
+        coords = Config.PositionArea[1],
+        distance = Config.Distance,
+        hidden = Config.Hidden,
+    })
+
+    ESX.RegisterInteraction('interactWithPed', function()
+        lib.showContext('Location')
+    end, function()
+        return canInteract
+    end)
+
+    function point:enter()
+        canInteract = true
+        ESX.TextUI(Language[Config.lang].Menu["Notification"])
+        print("Enter")
+    end
+
+    function point:leave()
+        canInteract = false
+        ESX.HideUI()
+        print("Leave")
     end
 end)
 
