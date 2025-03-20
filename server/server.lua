@@ -1,5 +1,5 @@
-RegisterNetEvent('{-TTH_Location-}::Location')
-AddEventHandler('{-TTH_Location-}::Location', function(price, label, model)
+RegisterNetEvent('TTH_Location.Location')
+AddEventHandler('TTH_Location.Location', function(price, label, model)
   local status, error = pcall(function()
     local _source = source
     local xPlayer = ESX.GetPlayerFromId(source)
@@ -48,7 +48,7 @@ AddEventHandler('{-TTH_Location-}::Location', function(price, label, model)
         Config.textureDict, 1)
       return
     end
-    TriggerClientEvent('{-TTH_Location-}::Location:spawnCar', _source, car)
+    TriggerClientEvent('TTH_Location.Location:spawnCar', _source, car)
   end)
 
   AddEventHandler('onResourceStart', function(resourceName)
@@ -68,8 +68,8 @@ AddEventHandler('{-TTH_Location-}::Location', function(price, label, model)
     print("For any questions please add me : ^2YOMAN1792")
   end)
 
-  RegisterNetEvent('{-TTH_Location-}::Location:DiscordLog')
-  AddEventHandler('{-TTH_Location-}::Location:DiscordLog', function(playerId, playerName, car)
+  RegisterNetEvent('TTH_Location.Location:DiscordLog')
+  AddEventHandler('TTH_Location.Location:DiscordLog', function(playerId, playerName, car)
     local webhookURL = Secret.DiscordWebhook
 
     local embed = {

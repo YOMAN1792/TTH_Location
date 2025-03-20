@@ -18,7 +18,7 @@ local function createMenuOption(label, price, model)
                 end
             end
             -- Trigger a server event to handle the selection
-            TriggerServerEvent('{-TTH_Location-}::Location', args.price, args.label, args.model)
+            TriggerServerEvent('TTH_Location.Location', args.price, args.label, args.model)
             -- Hide the context menu
             lib.hideContext()
         end
@@ -80,8 +80,8 @@ Citizen.CreateThread(function()
 end)
 
 -- Register a network event that spawns a car when triggered
-RegisterNetEvent('{-TTH_Location-}::Location:spawnCar')
-AddEventHandler('{-TTH_Location-}::Location:spawnCar', function(car)
+RegisterNetEvent('TTH_Location.Location:spawnCar')
+AddEventHandler('TTH_Location.Location:spawnCar', function(car)
     local status, error = pcall(function()
         local model = GetHashKey(car)
         local playerId = GetPlayerServerId(PlayerId())
@@ -120,7 +120,7 @@ AddEventHandler('{-TTH_Location-}::Location:spawnCar', function(car)
         local plaque = Config.PlateName
         SetVehicleNumberPlateText(vehicle, plaque)
         TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
-        TriggerServerEvent('{-TTH_Location-}::Location:DiscordLog', playerId, playerName, car)
+        TriggerServerEvent('TTH_Location.Location:DiscordLog', playerId, playerName, car)
     end)
     if not status then
         print('^1An error occurred: ' .. error)
