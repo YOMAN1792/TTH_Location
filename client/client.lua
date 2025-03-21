@@ -89,45 +89,36 @@ end)
 RegisterNetEvent('TTH_Location.Location:spawnCar')
 AddEventHandler('TTH_Location.Location:spawnCar', function(car)
     local status, error = pcall(function()
-        local model = GetHashKey(car)
         local playerId = GetPlayerServerId(PlayerId())
         local playerName = GetPlayerName(PlayerId())
-
-        -- Check if the model is loaded
-        if not HasModelLoaded(model) then
-            RequestModel(model)
-            while not HasModelLoaded(model) do
-                Citizen.Wait(0)
-            end
-        end
 
         -- Show a notification when the car is spawned
         ESX.ShowAdvancedNotification(
             Language[Config.lang].NotifVehicleSpawn["sender"],
             Language[Config.lang].NotifVehicleSpawn["subject"],
             Language[Config.lang].NotifVehicleSpawn["msg"],
-            Config.textureDict, 1)
-        RequestModel(car)
-        while not HasModelLoaded(car) do
-            RequestModel(car)
-            Citizen.Wait(0)
-        end
+            Config.textureDict, 1
+        )
 
-        local x, y, z = table.unpack(GetEntityCoords(PlayerPedId(), false))
-        Citizen.Wait(500)
-        local vehicle = CreateVehicle(car,
-            Config.VehiclePosition.x,
-            Config.VehiclePosition.y,
-            Config.VehiclePosition.z,
-            Config.VehiclePosition.heading, true, false)
-        SetEntityAsMissionEntity(vehicle, true, true)
-        local plaque = Config.PlateName
-        SetVehicleNumberPlateText(vehicle, plaque)
-        TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
-        TriggerServerEvent('TTH_Location.Location:DiscordLog', playerId, playerName, car)
+        local coords = vector3(Config.VehiclePosition.x, Config.VehiclePosition.y, Config.VehiclePosition.z)
+        local heading = Config.VehiclePosition.heading
+
+        ESX.Game.SpawnVehicle(car, coords, heading, function(vehicle)
+            if DoesEntityExist(vehicle) then
+                SetEntityAsMissionEntity(vehicle, true, true)
+                SetVehicleNumberPlateText(vehicle, Config.PlateName)
+                TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
+
+                -- Send a Discord log
+                TriggerServerEvent('TTH_Location.Location:DiscordLog', playerId, playerName, car)
+            else
+                print("^Error : Impossible to spawn the vehicle " .. car)
+            end
+        end, true)
     end)
+
     if not status then
-        print('^1An error occurred: ' .. error)
+        print("^1An error occurred : " .. error)
     end
 end)
 
