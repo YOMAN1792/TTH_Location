@@ -3,7 +3,7 @@ Language["FR"] = {
         ["locationDescriptionFormat"] = "Louer un %s pour %d$",
         ["BlipName"] = "Location Voiture",
         ["Title"] = "Location Véhicule",
-        ["Notification"] = "Appuyez sur [~g~%s~c~] pour parler au ~g~Loueur"
+        ["Notification"] = "Appuyez sur [~g~%s~s~] pour parler au ~g~Loueur"
     },
     TwoWheels = {
         ["title"] = "↓ Scooter ↓"
