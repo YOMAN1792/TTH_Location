@@ -70,7 +70,7 @@ Citizen.CreateThread(function()
 
     function point:enter()
         canInteract = true
-        ESX.TextUI(Language[Config.lang].Menu["Notification"])
+        ESX.TextUI(Language[Config.lang].Menu["Notification"]:format(ESX.GetInteractKey()))
         if Config.Debug == true then
             print("Enter")
         end
