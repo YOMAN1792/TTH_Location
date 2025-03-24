@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'YOMAN1792'
 description 'Location system done with OX_Lib for Esx'
-version '1.0.1'
+version '1.1.1'
 
 
 client_script "client/client.lua"
@@ -22,4 +22,8 @@ shared_scripts {
     'locales/*.lua',
 }
 
-dependencie 'es_extended'
+dependencies {
+    'es_extended',
+    'ox_lib',
+    '/onesync'
+} 
