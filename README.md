@@ -3,13 +3,15 @@
 ## Description
 
 TTH_Location is a script for FiveM that utilizes `ox_lib` and `esx`.
-It runs at 0ms and when the menu is opened or when you are near the ped, it's 0.02ms.
+It runs at a whopping 0.01 ms when the menu is opened.
+And it's highly optimized.
 
 ## Dependencies
 
 - ox_lib
 - ox_mysql
 - es_extended
+- OneSync
 
 ## Installation
 
