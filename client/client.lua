@@ -17,18 +17,19 @@ end
                     debugPrint("selected: ", selected)
                     debugPrint("args: ", args)
 
-                    if args then
-                        debugPrint("args.price: ", args.price)
-                        debugPrint("args.label: ", args.label)
-                        debugPrint("args.model: ", args.model)
+                    -- If arguments are missing or incomplete, print an error and return early
+                    if not args or not args.price or not args.label or not args.model then
+                        debugPrint("^1Error: Missing arguments for TriggerServerEvent. Ensure price, label, and model are valid.")
+                        return
                     end
 
-                -- Trigger a server event to handle the selection
-                if args.price and args.label and args.model then
+                    -- If debug mode is on, print details about the selected vehicle
+                    debugPrint("args.price: ", args.price)
+                    debugPrint("args.label: ", args.label)
+                    debugPrint("args.model: ", args.model)
+
+                    -- Trigger a server event to handle the vehicle selection
                     TriggerServerEvent('TTH_Location.Location', args.price, args.label, args.model)
-                else
-                    debugPrint("^1Error: Missing arguments for TriggerServerEvent. Ensure price, label, and model are valid.")
-                end
 
                 -- Hide the context menu
                 lib.hideContext()
@@ -59,7 +60,7 @@ end
 updateMenuOptions()
 
 -- Create a thread to show the context menu when the player is near the location
-Citizen.CreateThread(function()
+CreateThread(function()
     local canInteract = false
     local point = ESX.Point:new({
         coords = Config.PositionArea[1],
@@ -69,6 +70,7 @@ Citizen.CreateThread(function()
 
     ESX.RegisterInteraction('interactWithPed', function()
         lib.showContext('Location')
+        ESX.HideUI()
     end, function()
         return canInteract
     end)
@@ -87,7 +89,7 @@ Citizen.CreateThread(function()
 end)
 
 -- PED
-Citizen.CreateThread(function()
+CreateThread(function()
     local pedModel = "cs_lazlow"
     RequestModel(pedModel)
     while not HasModelLoaded(pedModel) do
@@ -103,7 +105,7 @@ Citizen.CreateThread(function()
 end)
 
 -- BLIPS
-Citizen.CreateThread(function()
+CreateThread(function()
     for _, v in ipairs(Config.BlipMap) do
         local blip = AddBlipForCoord(v.x, v.y, v.z)
 
