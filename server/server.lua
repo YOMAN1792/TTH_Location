@@ -8,41 +8,49 @@ local function debugPrint(...)
   end
 end
 
--- Event to handle vehicle rental
-RegisterNetEvent('TTH_Location.Location')
-AddEventHandler('TTH_Location.Location', function(price, label, model)
+local function isValidPrice(price)
+  return type(price) == 'number' and price >= 0
+end
+
+-- Event to handle vehicle rental (Main server-side entrypoint for renting a car)
+RegisterNetEvent('TTH_Location.Location', function(price, label, model)
   local status, err = pcall(function()
     local xPlayer = ESX.GetPlayerFromId(source)
     if not xPlayer then
       debugPrint('^1Error: Invalid player')
       return
     end
-
+    
     -- Validate the price input
-    if type(price) ~= 'number' or price < 0 then
-      debugPrint('Invalid price')
+    if not isValidPrice(price) then
+      debugPrint('^1Error: Invalid price -> ' .. tostring(price))
       return
-    end
-
+    end    
+    
     -- Validate if the car model is available in the configuration
     if not IsModelValid(model) then
       debugPrint('^1Error: Invalid car model -> ' .. tostring(model))
       return
     end
 
-    -- Check if the player has enough money in cash or bank
-    if xPlayer.getMoney() >= price then
+    -- Check money (cash and bank)
+    local cash = xPlayer.getMoney()
+    local bank = xPlayer.getAccount("bank").money
+
+    if cash >= price then
       xPlayer.removeMoney(price)
-    elseif xPlayer.getAccount("bank").money >= price then
+    elseif bank >= price then
       xPlayer.removeAccountMoney("bank", price)
     else
-      NotifyNoMoney()
+      NotifyNoMoney(source)
       return
     end
 
     -- Spawn the vehicle for the player
     TTH_Location.Location:spawnCar(source, model)
   end)
+
+  -- Catch and print any unexpected error
   if not status then
     print('^1An error occurred: ' .. tostring(err))
   end
@@ -54,6 +62,11 @@ function TTH_Location.Location:spawnCar(playerId, car)
   local coords = vector3(Config.VehiclePosition.x, Config.VehiclePosition.y, Config.VehiclePosition.z)
   local heading = Config.VehiclePosition.heading
 
+  if not car then
+    debugPrint("^1Error: No car model provided")
+    return
+  end
+  
   -- Notify the player that their vehicle has spawned
   TriggerClientEvent('esx:showAdvancedNotification', playerId,
     Language[Config.lang].NotifVehicleSpawn["sender"],
@@ -65,6 +78,7 @@ function TTH_Location.Location:spawnCar(playerId, car)
   -- Attempt to spawn the vehicle in the game world
   ESX.OneSync.SpawnVehicle(car, coords, heading, {}, function(networkId)
     if networkId and networkId ~= 0 then
+      Wait(100)
       local vehicle = NetworkGetEntityFromNetworkId(networkId)
       if DoesEntityExist(vehicle) then
         local playerPed = GetPlayerPed(playerId)
@@ -84,15 +98,27 @@ end
 
 -- Function to check if a model is valid based on configuration
 function IsModelValid(model)
-  if not Config.Cars or not Config.TwoWheels then return false end
+  local isValid = false
 
-  for _, v in ipairs(Config.Cars.vehicles) do
-    if v.model == model then return true end
+  if Config.Cars then
+    for _, v in ipairs(Config.Cars.vehicles) do
+      if v.model == model then
+        isValid = true
+        break
+      end
+    end
   end
-  for _, v in ipairs(Config.TwoWheels.vehicles) do
-    if v.model == model then return true end
+  
+  if not isValid and Config.TwoWheels then
+    for _, v in ipairs(Config.TwoWheels.vehicles) do
+      if v.model == model then
+        isValid = true
+        break
+      end
+    end
   end
-  return false
+  
+  return isValid  
 end
 
 -- Function to notify a player that they don't have enough money
@@ -117,6 +143,11 @@ function LogToDiscord(playerId, playerName, car)
         '**Vehicle :** ' .. car,
   }
 
+  if not webhookURL or webhookURL == '' then
+    debugPrint("^1Error: Discord webhook is not set!")
+    return
+  end
+
   PerformHttpRequest(webhookURL, function(err, text, headers) 
     if err ~= 200 and err ~= 204 then -- Ignore 204 (No Content) responses
       debugPrint("^1Error sending webhook: " .. tostring(err))
@@ -125,7 +156,7 @@ function LogToDiscord(playerId, playerName, car)
 end
 
 -- Event triggered when the resource starts
-AddEventHandler('onResourceStart', function(resourceName)
+RegisterNetEvent('onResourceStart', function(resourceName)
   if (GetCurrentResourceName() == resourceName) then
     print('The resource ' .. resourceName .. ' has been started. ^5:) Have a good day!')
     print("^6This script was made by YOMAN1792")
@@ -134,7 +165,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 end)
 
 -- Event triggered when the resource stops
-AddEventHandler('onResourceStop', function(resourceName)
+RegisterNetEvent('onResourceStop', function(resourceName)
   if (GetCurrentResourceName() == resourceName) then
     print('The resource ' .. resourceName .. ' was stopped. ^5:) Have a good day!')
     print("For any questions please add me : ^2YOMAN1792")
