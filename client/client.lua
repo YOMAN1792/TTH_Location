@@ -62,10 +62,9 @@ updateMenuOptions()
 -- Create a thread to show the context menu when the player is near the location
 CreateThread(function()
     local canInteract = false
-    local point = ESX.Point:new({
+    local point = lib.points.new({
         coords = Config.PositionArea[1],
         distance = Config.Distance,
-        hidden = Config.Hidden,
     })
 
     ESX.RegisterInteraction('interactWithPed', function()
@@ -75,13 +74,13 @@ CreateThread(function()
         return canInteract
     end)
 
-    function point:enter()
+    function point:onEnter()
         canInteract = true
         ESX.TextUI(Language[Config.lang].Menu["Notification"]:format(ESX.GetInteractKey()))
         debugPrint("Entered interaction zone")
     end
 
-    function point:leave()
+    function point:onExit()
         canInteract = false
         ESX.HideUI()
         debugPrint("Left interaction zone")
