@@ -6,8 +6,7 @@ author 'YOMAN1792'
 description 'Location system done with OX_Lib for Esx'
 version '1.2.0'
 
-
-client_script "client/client.lua"
+client_script 'client/client.lua'
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
@@ -19,11 +18,11 @@ shared_scripts {
     '@es_extended/imports.lua',
     '@ox_lib/init.lua',
     'config.lua',
-    'locales/*.lua',
+    'locales/*.lua'
 }
 
 dependencies {
     'es_extended',
     'ox_lib',
     '/onesync'
-} 
+}
