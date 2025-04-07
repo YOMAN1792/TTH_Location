@@ -15,9 +15,6 @@ Config = {
 	-- Sets the area where the player can open the menu
 	Distance = 1.0,
 
-	-- Sets whether the point is hidden or not
-	Hidden = false,
-
 	-- sets near the ped so when the player enter in the 1 M radius they can open the menu
 	PositionArea = {
 		vector3(-1034.8305, -2733.0974, 20.1692)
