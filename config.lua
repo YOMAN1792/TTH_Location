@@ -1,7 +1,7 @@
 Config = {
 	lang = "FR",
 
-	Debug = true,
+	Debug = false,
 
 	PlateName = "Location",
 
